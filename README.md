@@ -2,9 +2,11 @@
 
 Generates printable equipment nameplate labels from a pasted spreadsheet. Single HTML file, no build step, no dependencies, runs offline.
 
-**Live:** https://icoolaca.github.io/icc-nameplate-labels/
+**Live:** https://nervalcorp.github.io/icc-nameplate-labels/
 
-Built for ICC Energy nameplates; hosted here for convenience.
+Built for ICC Energy nameplates.
+
+**Author:** John L. — Nerval Corp
 
 ## Using it
 
