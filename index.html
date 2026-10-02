@@ -22,7 +22,7 @@ body{font-family:var(--ui);background:var(--stage);color:var(--ink);font-size:13
 .app-bar .right{margin-left:auto;display:flex;gap:8px;align-items:center}
 .shell{display:flex;height:calc(100% - 46px)}
 
-.panel{width:352px;flex:0 0 352px;background:#fff;border-right:1px solid var(--steel);overflow-y:auto;overscroll-behavior:contain}
+.panel{width:var(--panelw,352px);flex:0 0 var(--panelw,352px);background:#fff;overflow-y:auto;overscroll-behavior:contain}
 .grp{border-bottom:1px solid var(--steel-2)}
 .grp>summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;align-items:center;gap:8px;font:600 10.5px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:#4a5563;background:#fbfcfd;user-select:none}
 .grp>summary::-webkit-details-marker{display:none}
@@ -152,7 +152,7 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
 
 @media print{
   html,body{height:auto;overflow:visible;background:#fff}
-  .app-bar,.panel,.stage-bar,.tabs{display:none!important}
+  .app-bar,.panel,.splitter,.stage-bar,.tabs{display:none!important}
   .shell{display:block;height:auto}
   .stage{display:block}
   .stage-scroll{padding:0;overflow:visible}
@@ -166,6 +166,64 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
   body[data-page="letter"] .wrap{break-inside:avoid;page-break-inside:avoid}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
 }
+
+/* ---- resizable panel ---- */
+.splitter{flex:0 0 7px;cursor:col-resize;position:relative;z-index:5;background:#fff}
+.splitter::after{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;background:var(--steel)}
+.splitter:hover::after,body.resizing .splitter::after{left:2px;width:3px;background:var(--amber)}
+body.resizing{cursor:col-resize;user-select:none}
+.app-bar .save{font:400 10.5px/1 var(--mono);color:#8b96a3;letter-spacing:.04em;margin-right:4px}
+.app-bar button.sm{background:transparent;color:#c9d1d9;border-color:#4a5563}
+.app-bar button.sm:hover{background:#fff;color:var(--ink);border-color:#fff}
+
+/* ---- sheet grid ---- */
+.gtools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.gridwrap{
+  border:1px solid var(--steel);border-radius:3px;background:#fff;overflow:auto;
+  max-height:340px;min-height:132px;resize:vertical;outline:none;position:relative;
+  scroll-padding:26px 4px 4px 86px
+}
+.gridwrap:focus{border-color:var(--icc);box-shadow:0 0 0 1px var(--icc)}
+table.sheet{border-collapse:separate;border-spacing:0;table-layout:fixed;min-width:100%;font:400 11.5px/1.3 var(--mono)}
+table.sheet th,table.sheet td{
+  height:24px;padding:0 6px;border-right:1px solid #eceff2;border-bottom:1px solid #eceff2;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none;cursor:cell;background:#fff
+}
+table.sheet thead th{
+  position:sticky;top:0;z-index:3;background:#f3f5f7;text-align:left;
+  font:600 9px/24px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:#5b6673;border-bottom:1px solid var(--steel)
+}
+table.sheet .g1,table.sheet .g2{position:sticky;z-index:2;background:#f7f9fb;cursor:default;color:#7a8593}
+table.sheet .g1{left:0;text-align:right;padding:0 5px;font-size:10px}
+table.sheet .g2{left:32px;padding:0 4px;border-right:1px solid var(--steel)}
+table.sheet thead .g1,table.sheet thead .g2{z-index:4;background:#eef1f4}
+table.sheet tbody tr:hover .g1{color:var(--ink)}
+table.sheet td.sel,table.sheet th.sel{background:#e4edfa}
+table.sheet td.act,table.sheet th.act{background:#fff;box-shadow:inset 0 0 0 2px var(--icc)}
+table.sheet td.editing{padding:0;overflow:visible;box-shadow:inset 0 0 0 2px var(--icc)}
+table.sheet td input.ce{width:100%;height:100%;margin:0;padding:0 6px;border:0;border-radius:0;outline:none;background:#fff;font:inherit;color:var(--ink)}
+table.sheet .gempty{
+  height:128px;white-space:normal;text-align:center;vertical-align:middle;cursor:text;
+  color:#6b7684;font:400 11.5px/1.6 var(--ui);background:#fbfcfd;border:0
+}
+table.sheet .gempty span{color:#98a2ae}
+.gridwrap.isempty{border-style:dashed}
+.chip{display:inline-block;padding:1px 5px;border-radius:2px;background:#e6eaee;color:#3a4552;font:700 9px/1.5 var(--mono);letter-spacing:.06em}
+.chip.unm{background:#fdf1d0;color:#7a5a05;box-shadow:inset 0 0 0 1px #e9d9a8}
+details.rawbox{margin-top:10px;border:1px solid var(--steel-2);border-radius:3px}
+details.rawbox>summary{cursor:pointer;padding:8px 10px;font:600 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:#5b6673;background:#fbfcfd;list-style:none}
+details.rawbox>summary::-webkit-details-marker{display:none}
+details.rawbox>summary::before{content:"▸ ";color:var(--amber)}
+details.rawbox[open]>summary::before{content:"▾ "}
+details.rawbox .in{padding:10px}
+
+.stage-bar .count{white-space:nowrap}
+.stage-bar .note{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 0;text-align:right}
+@media screen{
+  .lbl td.tv[contenteditable="true"]{cursor:text;transition:background .12s}
+  .lbl td.tv[contenteditable="true"]:hover{background:#f2f6fd}
+}
+details.rawbox .in{padding:10px}
 </style>
 </head>
 <body data-page="single">
@@ -175,7 +233,9 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
   <span class="sep"></span>
   <span class="sub" id="sizeReadout">4" × 5.5"</span>
   <div class="right">
+    <span class="save" id="saveState"></span>
     <button class="sm" id="btnClear">Clear data</button>
+    <button class="sm" id="btnWipe" title="Remove everything this tool has saved in this browser">Clear saved data</button>
     <button class="pri" id="btnPrint">Print / Save PDF</button>
   </div>
 </div>
@@ -186,15 +246,30 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
   <details class="grp" open>
     <summary>1 · Data <span class="n" id="nRows">no rows</span></summary>
     <div class="body">
-      <label class="f"><span>Paste from Excel — include the header row</span>
-        <textarea id="paste" spellcheck="false" placeholder="Label Type&#9;Model&#9;Main Voltage&#9;Main PH&#9;FLA / RLA&#9;LRA&#9;…"></textarea></label>
-      <div class="btns">
-        <button class="pri" id="btnParse">Read data</button>
+      <div class="gtools">
+        <button class="sm" id="btnUndo" title="Undo (Ctrl+Z)" disabled>Undo</button>
+        <button class="sm" id="btnRedo" title="Redo (Ctrl+Y)" disabled>Redo</button>
+        <button class="sm" id="btnAddRow">+ Row</button>
+        <button class="sm" id="btnDupRow" title="Duplicate the selected row(s)">Duplicate</button>
+        <button class="sm dgr" id="btnDelRow" title="Delete the selected row(s)">Delete row</button>
+        <button class="sm" id="btnAddCol">+ Column</button>
+      </div>
+      <div class="gridwrap isempty" id="gridwrap" tabindex="0"><table class="sheet" id="sheet"></table></div>
+      <p class="hint"><b>Click a cell, then Ctrl+V</b> to paste from Excel — it fills right and down from there. To replace the whole sheet, click a header cell (or Ctrl+A) and paste. Double-click or just type to edit; drag to select; Ctrl+C copies back out. Click a row number to select a row.</p>
+      <div class="btns" style="margin-top:8px">
         <button id="btnFile">Open file…</button>
         <button class="amb" id="btnDemo">Load demo rows</button>
+        <button id="btnCopyAll">Copy for Excel</button>
       </div>
       <input type="file" id="file" accept=".csv,.tsv,.txt,.xlsx,.xls" hidden>
-      <p class="hint">Rows are sorted into the tabs above by their <b>Label Type</b> column. Rows with no recognised type go to the tab you are on.</p>
+      <details class="rawbox">
+        <summary>Raw text (tab-separated)</summary>
+        <div class="in">
+          <textarea id="paste" spellcheck="false" placeholder="Label Type&#9;Model&#9;Main Voltage&#9;Main PH&#9;FLA / RLA&#9;LRA&#9;…"></textarea>
+          <div class="btns" style="margin-top:8px"><button class="pri" id="btnParse">Read data</button></div>
+          <p class="hint">This always mirrors the grid, so it is current and copy-ready. Editing it does nothing until you press <b>Read data</b>, which replaces the sheet.</p>
+        </div>
+      </details>
       <div id="parseMsg"></div>
     </div>
   </details>
@@ -217,6 +292,8 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
         <label class="f"><span>Copies each</span><input type="number" id="copies" value="1" min="1" max="200" step="1"></label>
       </div>
       <label class="chk"><input type="checkbox" id="serFromCol" checked><span>Use the Serial column when the sheet has one</span></label>
+      <label class="chk"><input type="checkbox" id="serShare" checked><span>Rows with identical data share one serial</span></label>
+      <p class="hint" style="margin:-2px 0 8px">Identical single-copy rows count as the same label. For several units of one model, use <b>Copies</b> — every copy gets its own serial.</p>
       <label class="chk"><input type="checkbox" id="serOnLabel"><span>Print the serial again in the footer</span></label>
     </div>
   </details>
@@ -292,7 +369,7 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
           <select id="scope"><option value="one" selected>This type only</option><option value="all">Every type</option></select></label>
       </div>
       <p class="hint" style="margin:-4px 0 10px">The printed 2 pt border is the cut line. Set the printer to 100% / actual size — never "fit to page".</p>
-      <label class="chk"><input type="checkbox" id="editable" checked><span>Let me click a value and retype it</span></label>
+      <label class="chk"><input type="checkbox" id="editable" checked><span>Let me click a value on a label and edit it (saves to the sheet)</span></label>
     </div>
   </details>
 
@@ -310,6 +387,7 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
     </div>
   </details>
 </aside>
+<div class="splitter" id="splitter" title="Drag to resize · double-click to reset"></div>
 
 <section class="stage">
   <div class="tabs" id="tabs"></div>
@@ -320,7 +398,7 @@ table.tb{width:100%;border-collapse:collapse;table-layout:fixed}
     <input type="range" id="zoom" min="35" max="200" value="100" step="5">
     <span id="zoomVal" style="width:38px">100%</span>
     <button class="sm" id="btnFit">Fit</button>
-    <span class="note" id="editNote">Typed changes are lost when data or settings change.</span>
+    <span class="note" id="editNote">Click any value on a label to edit it — changes are saved to the sheet.</span>
   </div>
   <div class="stage-scroll" id="scroll"><div class="grid" id="grid"></div></div>
 </section>
@@ -434,15 +512,28 @@ const DEMO=[
 
 /* =============================================================
    STATE
+   One master sheet (S.headers + S.rows). Tabs never own data:
+   they are views of the sheet, filled by routeAll().
    ============================================================= */
-const S={tabs:[],active:0,art:{logo:DEFAULT_LOGO,etl:DEFAULT_ETL},zoom:1};
+const S={
+  headers:[],rows:[],nextId:1,idx:new Map(),
+  tabs:[],active:0,art:{logo:DEFAULT_LOGO,etl:DEFAULT_ETL},zoom:1,
+  sel:null,edit:null,undo:[],redo:[],reg:[],plan:[],panelw:352
+};
 const $=id=>document.getElementById(id);
 const clone=o=>JSON.parse(JSON.stringify(o));
 const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const escA=s=>esc(s).replace(/"/g,"&quot;");
+const escRe=s=>String(s).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
 const T=()=>S.tabs[S.active];
 
-function newTab(tpl){return {tpl:clone(tpl),headers:[],records:[],map:{},rows:[]};}
+function newTab(tpl){
+  const t=clone(tpl);
+  if(!t.id) t.id="type"+Math.random().toString(36).slice(2,8);
+  return {tpl:t,map:{},rows:[]};
+}
 function resetTabs(){S.tabs=BUILTIN.map(newTab);S.active=0;}
+function mkRow(rec){return {id:S.nextId++,rec,use:true,copies:null,tpl:T()?T().tpl.id:"",tab:0,matched:true};}
 
 /* =============================================================
    PARSING
@@ -465,20 +556,37 @@ function splitRows(text,d){
   row.push(cell);out.push(row);
   return out.filter(r=>r.some(v=>String(v).trim()!==""));
 }
+/* clipboard from Excel / Sheets: tab-separated, keeps empty rows and cells */
+function parseTSV(text){
+  text=text.replace(/\u00a0/g," ").replace(/\r\n?/g,"\n");
+  const out=[];let row=[],cell="",q=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(q){ if(ch==='"'){ if(text[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=ch; }
+    else if(ch==='"'&&cell==="") q=true;
+    else if(ch==="\t"){row.push(cell);cell="";}
+    else if(ch==="\n"){row.push(cell);out.push(row);row=[];cell="";}
+    else cell+=ch;
+  }
+  if(cell!==""||row.length){row.push(cell);out.push(row);}
+  return out;
+}
 const norm=h=>String(h).toLowerCase().replace(/[()]/g,"").replace(/\s+/g," ").replace(/\s*\/\s*/g,"/").trim();
 function looksLikeHeader(cells){
   const all=Object.values(LIB).flatMap(f=>f.syn.map(s=>s.replace(/\s*\/\s*/g,"/")));
   return cells.some(c=>all.includes(norm(c)));
 }
-function parseSheet(text){
-  const grid=splitRows(text.replace(/\u00a0/g," ").trim(),sniff(text));
+function gridToSheet(grid){
   if(!grid.length) return null;
   let head,body;
-  if(looksLikeHeader(grid[0])){head=grid[0].map(h=>h.trim());body=grid.slice(1);}
+  if(looksLikeHeader(grid[0])){head=grid[0].map(h=>String(h).trim());body=grid.slice(1);}
   else{head=grid[0].map((_,i)=>"Column "+(i+1));body=grid;}
-  const w=Math.max(head.length,...body.map(r=>r.length));
+  const w=Math.max(head.length,1,...body.map(r=>r.length));
   while(head.length<w) head.push("Column "+(head.length+1));
   return {headers:head,records:body.map(r=>{const o=[];for(let i=0;i<w;i++)o.push((r[i]??"").toString().trim());return o;})};
+}
+function parseSheet(text){
+  return gridToSheet(splitRows(text.replace(/\u00a0/g," ").trim(),sniff(text)));
 }
 
 /* field list of a template, resolved against LIB */
@@ -487,13 +595,19 @@ function tplFields(tpl){
     ? {k:f,n:(LIB[f]||{}).n||f,syn:(LIB[f]||{}).syn||[f]}
     : {k:f.k,n:f.n||f.k,syn:f.syn||[f.k]});
 }
-function autoMap(tab){
-  const used=new Set(),map={};
+/* keep=true leaves existing picks alone and only fills fields that have no column yet */
+function autoMap(tab,keep){
+  const map=keep?Object.assign({},tab.map):{},used=new Set();
+  if(keep) Object.keys(map).forEach(k=>{
+    if(map[k]>=S.headers.length) map[k]=-1;
+    if(map[k]>=0) used.add(map[k]);
+  });
   tplFields(tab.tpl).forEach(f=>{
+    if(keep&&(map[f.k]??-1)>=0) return;
     const syns=f.syn.map(s=>s.replace(/\s*\/\s*/g,"/"));
     let idx=-1;
-    tab.headers.forEach((h,i)=>{if(idx<0&&!used.has(i)&&syns.includes(norm(h)))idx=i;});
-    if(idx<0) tab.headers.forEach((h,i)=>{
+    S.headers.forEach((h,i)=>{if(idx<0&&!used.has(i)&&syns.includes(norm(h)))idx=i;});
+    if(idx<0) S.headers.forEach((h,i)=>{
       if(idx<0&&!used.has(i)){const n=norm(h);if(syns.some(s=>n===s||n.startsWith(s+" ")||n.replace(/ /g,"")===s.replace(/ /g,"")))idx=i;}
     });
     if(idx>=0) used.add(idx);
@@ -501,47 +615,126 @@ function autoMap(tab){
   });
   tab.map=map;
 }
-function buildRows(tab){
-  const prev={};tab.rows.forEach(r=>prev[r.i]={use:r.use,copies:r.copies});
-  tab.rows=tab.records.map((rec,i)=>({
-    i,rec,
-    model:(tab.map.model>=0?rec[tab.map.model]:"")||"(no model)",
-    use:prev[i]?prev[i].use:true,copies:prev[i]?prev[i].copies:null
-  }));
-}
-function routeAndLoad(text){
-  const p=parseSheet(text);
-  if(!p) return {ok:false,msg:"Nothing to read — paste the cells including the header row."};
-  let typeIdx=-1;
+
+/* =============================================================
+   ROUTING — which tab does each sheet row belong to
+   ============================================================= */
+function typeCol(){
   const syn=LIB.type.syn.map(s=>s.replace(/\s*\/\s*/g,"/"));
-  p.headers.forEach((h,i)=>{if(typeIdx<0&&syn.includes(norm(h)))typeIdx=i;});
-  S.tabs.forEach(t=>{t.headers=p.headers.slice();t.records=[];});
-  let unmatched=0;
-  p.records.forEach(rec=>{
-    const v=(typeIdx>=0?rec[typeIdx]:"").toLowerCase();
-    let ti=-1;
-    if(v) S.tabs.forEach((t,i)=>{if(ti<0&&(t.tpl.match||[]).some(m=>m&&v.includes(String(m).toLowerCase())))ti=i;});
-    if(ti<0){ti=S.active;if(typeIdx>=0)unmatched++;}
-    S.tabs[ti].records.push(rec);
+  return S.headers.findIndex(h=>syn.includes(norm(h)));
+}
+function routeAll(){
+  const ti=typeCol();
+  S.tabs.forEach(t=>t.rows=[]);
+  S.idx=new Map();
+  S.rows.forEach(r=>{
+    S.idx.set(r.id,r);
+    const v=(ti>=0?(r.rec[ti]||""):"").toLowerCase();
+    let k=-1;
+    if(v) S.tabs.forEach((t,i)=>{if(k<0&&(t.tpl.match||[]).some(m=>m&&v.includes(String(m).toLowerCase())))k=i;});
+    r.matched=k>=0||ti<0;
+    if(k<0){k=S.tabs.findIndex(t=>t.tpl.id===r.tpl);if(k<0)k=0;}
+    r.tab=k;S.tabs[k].rows.push(r);
   });
-  S.tabs.forEach(t=>{autoMap(t);buildRows(t);});
-  const parts=S.tabs.filter(t=>t.records.length).map(t=>t.records.length+" → "+t.tpl.name);
-  let msg=p.records.length+" rows read. "+(parts.join(" · ")||"none matched");
-  if(typeIdx<0) msg+=". No Label Type column found, so everything went to "+T().tpl.name+".";
-  else if(unmatched) msg+=". "+unmatched+" row(s) had an unrecognised type and went to "+T().tpl.name+".";
-  return {ok:true,msg};
+}
+const modelOf=(tab,r)=>(tab.map.model>=0?r.rec[tab.map.model]:"")||"(no model)";
+
+/* =============================================================
+   UNDO — whole-sheet snapshots. Print ticks and copy counts are
+   left alone by undo so a data fix never un-ticks a row.
+   ============================================================= */
+function snap(){
+  return JSON.stringify({h:S.headers,r:S.rows.map(r=>({i:r.id,c:r.rec,u:r.use,n:r.copies,t:r.tpl})),
+    m:S.tabs.map(t=>[t.tpl.id,t.map]),nx:S.nextId});
+}
+function loadSnap(s){
+  const d=JSON.parse(s),cur=new Map(S.rows.map(r=>[r.id,r]));
+  S.headers=d.h;S.nextId=Math.max(S.nextId,d.nx);
+  S.rows=d.r.map(x=>{const c=cur.get(x.i);
+    return {id:x.i,rec:x.c,use:c?c.use:x.u,copies:c?c.copies:x.n,tpl:x.t,tab:0,matched:true};});
+  d.m.forEach(([id,map])=>{const t=S.tabs.find(t=>t.tpl.id===id);if(t)t.map=map;});
+}
+function pushUndo(){S.undo.push(snap());if(S.undo.length>40)S.undo.shift();S.redo=[];undoBtns();}
+function undo(){if(!S.undo.length)return;endEdit(false);S.redo.push(snap());loadSnap(S.undo.pop());S.sel=null;refresh();}
+function redo(){if(!S.redo.length)return;endEdit(false);S.undo.push(snap());loadSnap(S.redo.pop());S.sel=null;refresh();}
+function undoBtns(){$("btnUndo").disabled=!S.undo.length;$("btnRedo").disabled=!S.redo.length;}
+
+/* =============================================================
+   SERIAL PLAN
+   Every label that will print, in order, with its serial.
+   - a Serial column value wins (when the box is ticked)
+   - otherwise the pattern counter
+   - single-copy rows with identical data (ignoring the Serial
+     column) are the same label, so they share one serial
+   - rows printing several copies get one serial per copy
+   ============================================================= */
+const gcopies=()=>Math.max(1,parseInt($("copies").value||"1",10));
+const rowCopies=r=>Math.max(1,r.copies||gcopies());
+function genSerial(tab,r,n){
+  const pad=Math.max(1,parseInt($("serPad").value||"1",10));
+  return ($("serPat").value||"{n}")
+    .replace(/\{n\}/g,String(n).padStart(pad,"0"))
+    .replace(/\{model\}/gi,tab.map.model>=0?r.rec[tab.map.model]:"")
+    .replace(/\{yy\}/gi,String(new Date().getFullYear()).slice(-2));
+}
+function tabKey(tab,r){
+  const si=tab.map.serial;
+  return S.tabs.indexOf(tab)+"|"+r.rec.map((v,i)=>i===si?"":String(v).trim()).join("\u0001");
+}
+function computePlan(){
+  const all=$("scope").value==="all",tabs=all?S.tabs:[T()];
+  let counter=Math.max(0,parseInt($("serStart").value||"1",10));
+  const share=$("serShare").checked,fromCol=$("serFromCol").checked;
+  const seen=Object.create(null),plan=[];
+  tabs.forEach(tab=>{
+    const si=tab.map.serial;
+    tab.rows.filter(r=>r.use).forEach(r=>{
+      const copies=rowCopies(r);
+      for(let c=0;c<copies;c++){
+        const explicit=(fromCol&&si>=0)?(r.rec[si]||""):"";
+        let serial,key=null;
+        if(copies===1&&share){
+          key=tabKey(tab,r);
+          if(seen[key]!==undefined&&!explicit) serial=seen[key];
+        }
+        if(serial===undefined){
+          serial=explicit||genSerial(tab,r,counter);counter++;
+          if(key!==null&&seen[key]===undefined) seen[key]=serial;
+        }
+        plan.push({tab,row:r,copy:c,copies,serial});
+      }
+    });
+  });
+  return plan;
 }
 
 /* =============================================================
    LABEL RENDERING
    ============================================================= */
-function cellVal(tab,rec,c){
+function cellVal(tab,rec,c,serial){
+  if(c.f==="serial") return serial||"";
   const g=k=>{const i=tab.map[k];return i>=0&&i<rec.length?rec[i]:"";};
   let v=c.f?g(c.f):"";
   if(!v&&c.fallback) v=g(c.fallback);
-  if(v&&c.strip) v=v.replace(new RegExp(c.strip+"$","i"),"");
-  if(v&&c.suffix&&!new RegExp(c.suffix+"$","i").test(v)) v+=c.suffix;
+  if(v&&c.strip) v=v.replace(new RegExp(escRe(c.strip)+"$","i"),"");
+  if(v&&c.suffix&&!new RegExp(escRe(c.suffix)+"$","i").test(v)) v+=c.suffix;
   if(v&&c.prefix) v=c.prefix+v;
+  return v;
+}
+/* the reverse of cellVal: what to store in the sheet for text typed on a label,
+   keeping the sheet's own formatting (a stored "60HZ" stays "60HZ") */
+function toData(c,raw,text){
+  let v=text;
+  if(c.prefix&&v.startsWith(c.prefix)) v=v.slice(c.prefix.length);
+  if(c.suffix){
+    const re=new RegExp(escRe(c.suffix)+"$","i"),had=re.test(raw);
+    if(re.test(v)&&!had) v=v.replace(re,"");
+    else if(had&&v&&!re.test(v)) v+=c.suffix;
+  }
+  if(c.strip){
+    const re=new RegExp(escRe(c.strip)+"$","i"),m=raw.match(re);
+    if(m&&v&&!re.test(v)) v+=m[0];
+  }
   return v;
 }
 function widths(list,key){
@@ -550,11 +743,21 @@ function widths(list,key){
 }
 function tblWidth(b){return b.w&&+b.w<1?' style="width:'+(+b.w*100).toFixed(2)+'%"':"";}
 function hAttr(h){return h?' style="height:calc('+(+h)+'px*var(--k))"':"";}
+/* a value cell; when editing is on it is registered so a typed change can be written back */
+function tvCell(ctx,c,cls,style){
+  const v=cellVal(ctx.tab,ctx.rec,c,ctx.serial);
+  let a="";
+  if(ctx.ed&&c.f){
+    const id=S.reg.length;
+    S.reg.push({pi:ctx.pi,c,kind:c.f==="serial"?"serial":"cell"});
+    a=' contenteditable="true" spellcheck="false" data-ce="'+id+'" data-v="'+escA(v)+'"';
+  }
+  return '<td class="'+cls+'"'+(style||"")+a+'>'+esc(v)+'</td>';
+}
 function renderBlock(b,ctx){
-  const ed=ctx.ed?' contenteditable="true"':"";
   switch(b.t){
     case "head":
-      return '<div class="l-head"><h1 class="l-title"'+ed+'>'+esc(ctx.title)+'</h1>'
+      return '<div class="l-head"><h1 class="l-title">'+esc(ctx.title)+'</h1>'
         +'<div class="l-logo">'+(S.art.logo?'<img src="'+S.art.logo+'" alt="">':'<div class="slot">Brand<br>logo</div>')+'</div></div>';
     case "heading":
       return '<h2 class="l-sec">'+esc(b.text||"")+'</h2>';
@@ -562,17 +765,17 @@ function renderBlock(b,ctx){
       const cs=b.cells||[];
       return '<table class="tb"'+tblWidth(b)+'><colgroup>'+widths(cs)+'</colgroup><tbody><tr>'
         +cs.map(c=>'<td class="tk"'+hAttr(b.kh)+'>'+esc(c.k||"")+'</td>').join("")+'</tr><tr>'
-        +cs.map(c=>'<td class="tv"'+hAttr(b.vh)+ed+'>'+esc(cellVal(ctx.tab,ctx.rec,c))+'</td>').join("")+'</tr></tbody></table>';
+        +cs.map(c=>tvCell(ctx,c,"tv",hAttr(b.vh))).join("")+'</tr></tbody></table>';
     }
     case "pair":{
       const kw=+b.kw||1;
       return '<table class="tb pair"'+tblWidth(b)+'><colgroup><col style="width:'+(kw/(kw+1)*100).toFixed(2)+'%"><col></colgroup>'
-        +'<tbody><tr><td class="tk"'+hAttr(b.vh)+'>'+esc(b.k||"")+'</td><td class="tv"'+ed+'>'+esc(cellVal(ctx.tab,ctx.rec,b))+'</td></tr></tbody></table>';
+        +'<tbody><tr><td class="tk"'+hAttr(b.vh)+'>'+esc(b.k||"")+'</td>'+tvCell(ctx,b,"tv")+'</tr></tbody></table>';
     }
     case "kvlist":{
       const kw=+b.kw||1.6;
       return '<table class="tb kvl"'+tblWidth(b)+'><colgroup><col style="width:'+(kw/(kw+1)*100).toFixed(2)+'%"><col></colgroup><tbody>'
-        +(b.items||[]).map(i=>'<tr><td class="tk lft">'+esc(i.k||"")+'</td><td class="tv rgt"'+ed+'>'+esc(cellVal(ctx.tab,ctx.rec,i))+'</td></tr>').join("")
+        +(b.items||[]).map(i=>'<tr><td class="tk lft">'+esc(i.k||"")+'</td>'+tvCell(ctx,i,"tv rgt")+'</tr>').join("")
         +'</tbody></table>';
     }
     case "group":
@@ -583,7 +786,7 @@ function renderBlock(b,ctx){
     case "mark":
       return '<div class="l-mark">'+(S.art.etl?'<img src="'+S.art.etl+'" alt="">':'<div class="slot">Certification<br>mark</div>')+'</div>';
     case "foot":
-      return '<div class="l-foot"><span class="ft"'+ed+'>'+esc($("foot").value)+'</span>'
+      return '<div class="l-foot"><span class="ft">'+esc($("foot").value)+'</span>'
         +($("serOnLabel").checked?'<span class="ser">'+esc(ctx.serial)+'</span>':'')+'</div>';
     case "gap":
       return '<div style="height:calc('+(+b.h||8)+'px*var(--k))"></div>';
@@ -594,23 +797,14 @@ function renderBlocks(list,ctx){return (list||[]).map(b=>{
   const h=renderBlock(b,ctx);
   return b.mt!=null?'<div style="margin-top:calc('+(+b.mt)+'px*var(--k))">'+h+'</div>':h;
 }).join("");}
-function labelHTML(tab,rec,serial){
-  const tpl=tab.tpl;
+function labelHTML(p,pi){
+  const tab=p.tab,tpl=tab.tpl,rec=p.row.rec;
   const typeVal=tab.map.type>=0?rec[tab.map.type]:"";
-  const ctx={tab,rec,serial,ed:$("editable").checked,title:(tpl.title||typeVal||tpl.name||"").toUpperCase()};
+  const ctx={tab,rec,pi,serial:p.serial,ed:$("editable").checked,title:(tpl.title||typeVal||tpl.name||"").toUpperCase()};
   const st=(tpl.titleSize?'--ts:'+(+tpl.titleSize)+'px;':'')+(tpl.secSize?'--ss:'+(+tpl.secSize)+'px;':'')
     +(tpl.padX?'--pdx:'+(+tpl.padX)+'px;':'')+(tpl.padY?'--pdy:'+(+tpl.padY)+'px;':'')
     +(tpl.headH?'--hh:'+(+tpl.headH)+'px;':'');
   return '<div class="lbl '+(tpl.boxed?"boxed":"open")+(tpl.flow==="top"?" flow-top":"")+'"'+(st?' style="'+st+'"':'')+'>'+renderBlocks(tpl.blocks||[],ctx)+'</div>';
-}
-function makeSerial(tab,rec,counter){
-  if($("serFromCol").checked&&tab.map.serial>=0){const s=rec[tab.map.serial];if(s)return s;}
-  const pad=Math.max(1,parseInt($("serPad").value||"1",10));
-  const model=tab.map.model>=0?rec[tab.map.model]:"";
-  return ($("serPat").value||"{n}")
-    .replace(/\{n\}/g,String(counter).padStart(pad,"0"))
-    .replace(/\{model\}/gi,model)
-    .replace(/\{yy\}/gi,String(new Date().getFullYear()).slice(-2));
 }
 
 /* =============================================================
@@ -632,39 +826,415 @@ function applySize(){
   document.querySelectorAll(".lbl").forEach(l=>l.style.setProperty("--k",(w/4).toFixed(4)));
   $("sizeReadout").textContent=w+'" × '+h+'"';
 }
-function render(){
-  const grid=$("grid"),all=$("scope").value==="all";
-  const tabs=all?S.tabs:[T()];
-  if(!tabs.some(t=>t.records.length)){
-    grid.innerHTML='<div class="empty"><h2>No rows on this type</h2><p>Paste your sheet into step 1 — rows are sorted into these tabs by their Label Type column. <b>Load demo rows</b> shows both built-in types side by side.</p></div>';
-    $("labelCount").textContent="0 labels";applySize();return;
-  }
-  const global=Math.max(1,parseInt($("copies").value||"1",10));
-  let counter=Math.max(0,parseInt($("serStart").value||"1",10)),n=0;
-  const parts=[];
-  tabs.forEach(tab=>{
-    tab.rows.filter(r=>r.use).forEach(r=>{
-      const copies=Math.max(1,r.copies||global);
-      for(let c=0;c<copies;c++){
-        const serial=makeSerial(tab,r.rec,counter++);n++;
-        parts.push('<div class="wrap">'+labelHTML(tab,r.rec,serial)
-          +'<div class="tag">'+esc(r.model)+' · '+esc(serial)+(all?' · '+esc(tab.tpl.name):'')+'</div></div>');
-      }
-    });
-  });
-  grid.innerHTML=parts.join("")||'<div class="empty"><h2>Nothing selected</h2><p>Tick some rows in step 7.</p></div>';
-  applySize();
-  $("labelCount").textContent=n+(n===1?" label":" labels");
+const DEFAULT_NOTE="Click any value on a label to edit it — changes are saved to the sheet.";
+let noteT=null;
+function setNote(text,warn){const n=$("editNote");n.className=warn?"note warn":"note";n.textContent=text||DEFAULT_NOTE;}
+function flashNote(t){setNote(t,true);clearTimeout(noteT);noteT=setTimeout(checkOverflow,7000);}
+function checkOverflow(){
   let over=0;
   document.querySelectorAll("#grid .wrap").forEach(w=>{
-    const l=w.querySelector(".lbl");
-    if(l&&l.scrollHeight>l.clientHeight+1){w.classList.add("over");over++;}
+    const l=w.querySelector(".lbl"),o=!!(l&&l.scrollHeight>l.clientHeight+1);
+    w.classList.toggle("over",o);if(o)over++;
   });
-  $("editNote").className=over?"note warn":"note";
-  $("editNote").textContent=over
-    ? over+(over===1?" label is":" labels are")+" taller than the stock — widen a column or trim a row height in step 5."
-    : "Typed changes are lost when data or settings change.";
+  setNote(over?over+(over===1?" label is":" labels are")+" taller than the stock — widen a column or trim a row height in step 5.":"",!!over);
 }
+const tagText=(p,all)=>esc(modelOf(p.tab,p.row))+' · '+esc(p.serial)+(all?' · '+esc(p.tab.tpl.name):'');
+function render(){
+  const grid=$("grid"),all=$("scope").value==="all";
+  S.reg=[];S.plan=computePlan();
+  if(!S.rows.length){
+    grid.innerHTML='<div class="empty"><h2>No data yet</h2><p>Click the grid in step 1 and paste your sheet from Excel (Ctrl+V). Rows are sorted into these tabs by their Label Type column. <b>Load demo rows</b> shows both built-in types.</p></div>';
+    $("labelCount").textContent="0 labels";applySize();return;
+  }
+  if(!S.plan.length){
+    const none=(all?S.rows:T().rows).length===0;
+    grid.innerHTML=none
+      ?'<div class="empty"><h2>No rows on this type</h2><p>Rows land on a tab when their Label Type column matches it. Check the chips in the Tab column of the grid, or the match list in step 5.</p></div>'
+      :'<div class="empty"><h2>Nothing selected</h2><p>Tick some rows in step 7.</p></div>';
+    $("labelCount").textContent="0 labels";applySize();return;
+  }
+  grid.innerHTML=S.plan.map((p,i)=>'<div class="wrap" data-p="'+i+'">'+labelHTML(p,i)+'<div class="tag">'+tagText(p,all)+'</div></div>').join("");
+  applySize();
+  $("labelCount").textContent=S.plan.length+(S.plan.length===1?" label":" labels");
+  checkOverflow();
+}
+/* update values in place after a data edit, so focus, scroll and zoom do not move */
+function patchStage(){
+  const plan=computePlan(),all=$("scope").value==="all";
+  if(plan.length!==S.plan.length||plan.some((p,i)=>p.row!==S.plan[i].row||p.tab!==S.plan[i].tab)) return render();
+  S.plan=plan;
+  const els={};
+  $("grid").querySelectorAll("[data-ce]").forEach(el=>els[el.dataset.ce]=el);
+  S.reg.forEach((g,i)=>{
+    const el=els[i];if(!el)return;
+    const p=plan[g.pi],v=cellVal(p.tab,p.row.rec,g.c,p.serial);
+    el.dataset.v=v;
+    if(document.activeElement!==el&&el.textContent!==v) el.textContent=v;
+  });
+  $("grid").querySelectorAll(".wrap").forEach(w=>{
+    const p=plan[+w.dataset.p];if(!p)return;
+    const t=w.querySelector(".tag");if(t)t.innerHTML=tagText(p,all);
+    const s=w.querySelector(".l-foot .ser");if(s)s.textContent=p.serial;
+  });
+  checkOverflow();
+}
+
+/* ---- typing on a label writes to the sheet ---- */
+function ensureColumn(tab,f){
+  const fld=tplFields(tab.tpl).find(x=>x.k===f);
+  S.headers.push((fld&&fld.n)||(LIB[f]||{}).n||f);
+  S.rows.forEach(r=>r.rec.push(""));
+  const idx=S.headers.length-1;
+  tab.map[f]=idx;
+  S.tabs.forEach(t=>{if(t!==tab)autoMap(t,true);});
+  return idx;
+}
+function gridRowRefresh(r){
+  const i=S.rows.indexOf(r),b=gt().tBodies[0];
+  if(i<0||!b||!b.rows[i])return;
+  S.headers.forEach((_,c)=>{
+    const td=b.rows[i].cells[c+2];
+    if(td&&!td.classList.contains("editing")){const v=r.rec[c]||"";if(td.textContent!==v)td.textContent=v;}
+  });
+}
+function finishEdit(structural,rows){
+  if(structural) refresh({grid:"full",stage:"patch"});
+  else{rows.forEach(gridRowRefresh);refresh({grid:"none",stage:"patch"});}
+}
+function commitStage(el){
+  if(!document.body.contains(el)) return;
+  const reg=S.reg[+el.dataset.ce];if(!reg) return;
+  const p=S.plan[reg.pi];if(!p) return;
+  const text=el.textContent.replace(/\s+/g," ").trim(),shown=el.dataset.v||"";
+  if(text===shown){el.textContent=shown;return;}
+  if(reg.kind==="serial") return commitSerial(el,p,text,shown);
+  const tab=p.tab,r=p.row,f=reg.c.f;
+  let ci=tab.map[f]??-1,structural=false;
+  const rawOld=ci>=0?(r.rec[ci]||""):"";
+  const nv=toData(reg.c,rawOld,text);
+  if(nv===rawOld){patchStage();return;}
+  pushUndo();
+  if(ci<0){ci=ensureColumn(tab,f);structural=true;}
+  r.rec[ci]=nv;
+  finishEdit(structural,[r]);
+}
+function commitSerial(el,p,text,shown){
+  if(p.copies!==1){
+    el.textContent=shown;
+    flashNote("A row printing several copies gets one serial per copy, so those aren't saved to the sheet. Set its Copies to 1, or list each unit as its own row.");
+    return;
+  }
+  const tab=p.tab,r=p.row,share=$("serShare").checked;
+  pushUndo();
+  let si=tab.map.serial??-1,structural=false;
+  if(si<0){si=ensureColumn(tab,"serial");structural=true;}
+  const key=tabKey(tab,r);
+  const grp=share?tab.rows.filter(x=>rowCopies(x)===1&&tabKey(tab,x)===key):[r];
+  grp.forEach(x=>{x.rec[si]=text;});
+  $("serFromCol").checked=true;
+  finishEdit(structural,grp);
+}
+$("grid").addEventListener("focusout",e=>{const el=e.target.closest&&e.target.closest("[data-ce]");if(el)commitStage(el);});
+$("grid").addEventListener("keydown",e=>{
+  const el=e.target.closest&&e.target.closest("[data-ce]");if(!el)return;
+  if(e.key==="Enter"){e.preventDefault();el.blur();}
+  else if(e.key==="Escape"){e.preventDefault();el.textContent=el.dataset.v||"";el.blur();}
+});
+$("grid").addEventListener("paste",e=>{
+  const el=e.target.closest&&e.target.closest("[data-ce]");if(!el)return;
+  e.preventDefault();
+  const t=((e.clipboardData||window.clipboardData).getData("text/plain")||"").replace(/\s*\n\s*/g," ");
+  document.execCommand("insertText",false,t);
+});
+
+/* =============================================================
+   SHEET GRID  (step 1)
+   ============================================================= */
+const gw=()=>$("gridwrap"),gt=()=>$("sheet");
+const nR=()=>S.rows.length,nC=()=>S.headers.length;
+function cellEl(r,c){
+  const t=gt();if(!t.tHead||!t.tBodies[0])return null;
+  if(r<0)return t.tHead.rows[0].cells[c+2]||null;
+  const row=t.tBodies[0].rows[r];return row?(row.cells[c+2]||null):null;
+}
+function chipHTML(r){
+  const tab=S.tabs[r.tab],nm=tab?tab.tpl.name:"?",un=!r.matched;
+  return '<span class="chip'+(un?" unm":"")+'" title="'+escA(nm+(un?" — Label Type not recognised, placed here by default":""))+'">'+esc(nm.slice(0,3).toUpperCase())+(un?"?":"")+'</span>';
+}
+function gridChips(){
+  const b=gt().tBodies[0];if(!b||!S.headers.length)return;
+  S.rows.forEach((r,i)=>{const row=b.rows[i];if(row)row.cells[1].innerHTML=chipHTML(r);});
+}
+function gridRender(){
+  const t=gt(),wrap=gw();
+  if(!S.headers.length){
+    t.style.width="";
+    t.innerHTML='<tbody><tr><td class="gempty">Click here, then paste your sheet from Excel (Ctrl+V).<br>Include the header row.<br><span>Or use Open file… / Load demo rows below.</span></td></tr></tbody>';
+    wrap.classList.add("isempty");return;
+  }
+  wrap.classList.remove("isempty");
+  const W=S.headers.map((h,c)=>{
+    let m=String(h).length*1.15;
+    for(const r of S.rows){const l=(r.rec[c]||"").length;if(l>m)m=l;}
+    return Math.max(64,Math.min(210,Math.round(m*7.2+18)));
+  });
+  let h='<colgroup><col style="width:32px"><col style="width:50px">'+W.map(w=>'<col style="width:'+w+'px">').join("")+'</colgroup>';
+  h+='<thead><tr data-r="-1"><th class="g1">#</th><th class="g2">Tab</th>'
+    +S.headers.map((x,c)=>'<th data-c="'+c+'" title="'+escA(x)+' — double-click to rename">'+esc(x)+'</th>').join("")+'</tr></thead><tbody>';
+  S.rows.forEach((r,i)=>{
+    h+='<tr data-r="'+i+'"><td class="g1">'+(i+1)+'</td><td class="g2">'+chipHTML(r)+'</td>'
+      +S.headers.map((_,c)=>'<td data-c="'+c+'">'+esc(r.rec[c]||"")+'</td>').join("")+'</tr>';
+  });
+  t.style.width=(82+W.reduce((a,b)=>a+b,0))+"px";
+  t.innerHTML=h+'</tbody>';
+  paintSel(false);
+}
+
+/* selection */
+function normSel(){const s=S.sel;if(!s)return null;return {r0:Math.min(s.r0,s.r1),r1:Math.max(s.r0,s.r1),c0:Math.min(s.c0,s.c1),c1:Math.max(s.c0,s.c1)};}
+let selEls=[];
+function paintSel(scroll){
+  selEls.forEach(e=>e.classList.remove("sel","act"));selEls=[];
+  const n=normSel();if(!n||!S.headers.length)return;
+  for(let r=n.r0;r<=n.r1;r++)for(let c=n.c0;c<=n.c1;c++){const e=cellEl(r,c);if(e){e.classList.add("sel");selEls.push(e);}}
+  const a=cellEl(S.sel.r1,S.sel.c1);
+  if(a){a.classList.add("act");if(scroll&&!S.edit)a.scrollIntoView({block:"nearest",inline:"nearest"});}
+}
+function setSel(r0,c0,r1,c1,scroll){
+  const rm=nR()-1,cm=nC()-1,cl=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+  S.sel={r0:cl(r0,-1,rm),c0:cl(c0,0,cm),r1:cl(r1,-1,rm),c1:cl(c1,0,cm)};
+  paintSel(scroll);
+}
+function isAllSel(){const n=normSel();return !!n&&nR()>0&&n.r0<=0&&n.r1>=nR()-1&&n.c0===0&&n.c1>=nC()-1;}
+
+/* mouse */
+let dragging=false,rowDrag=false;
+function hit(e){
+  const td=e.target.closest&&e.target.closest("td,th");
+  if(!td||!gt().contains(td)||!td.parentElement||td.parentElement.dataset.r==null)return null;
+  const r=+td.parentElement.dataset.r;
+  if(td.classList.contains("g1")||td.classList.contains("g2")) return r<0?{r:-1,c:0,all:true}:{r,c:0,row:true};
+  if(td.dataset.c==null)return null;
+  return {r,c:+td.dataset.c};
+}
+gw().addEventListener("mousedown",e=>{
+  if(e.button!==0)return;
+  if(S.edit&&e.target===S.edit.inp)return;
+  if(S.edit)endEdit(true);
+  const h=hit(e);
+  if(!h)return;
+  e.preventDefault();gw().focus({preventScroll:true});
+  if(h.all){setSel(0,0,nR()-1,nC()-1);return;}
+  if(h.row){
+    if(e.shiftKey&&S.sel)setSel(S.sel.r0,0,h.r,nC()-1);else setSel(h.r,0,h.r,nC()-1);
+    rowDrag=true;return;
+  }
+  if(e.shiftKey&&S.sel)setSel(S.sel.r0,S.sel.c0,h.r,h.c);else setSel(h.r,h.c,h.r,h.c);
+  dragging=true;
+});
+gw().addEventListener("mouseover",e=>{
+  if(!dragging&&!rowDrag)return;
+  const h=hit(e);if(!h||!S.sel)return;
+  if(rowDrag&&h.row)setSel(S.sel.r0,0,h.r,nC()-1);
+  else if(dragging&&!h.row&&!h.all)setSel(S.sel.r0,S.sel.c0,h.r,h.c);
+});
+document.addEventListener("mouseup",()=>{dragging=false;rowDrag=false;});
+gw().addEventListener("dblclick",e=>{const h=hit(e);if(h&&!h.row&&!h.all)startEdit(h.r,h.c);});
+
+/* keyboard */
+function move(dr,dc,ext){
+  if(!S.sel){setSel(0,0,0,0,true);return;}
+  const s=S.sel,r=s.r1+dr,c=s.c1+dc;
+  if(ext)setSel(s.r0,s.c0,r,c,true);else setSel(r,c,r,c,true);
+}
+gw().addEventListener("keydown",e=>{
+  if(S.edit)return;
+  const mod=e.ctrlKey||e.metaKey,k=e.key;
+  if(mod&&(k==="z"||k==="Z")){e.preventDefault();e.shiftKey?redo():undo();return;}
+  if(mod&&(k==="y"||k==="Y")){e.preventDefault();redo();return;}
+  if(!S.headers.length)return;
+  if(mod&&(k==="a"||k==="A")){e.preventDefault();setSel(0,0,nR()-1,nC()-1);return;}
+  if(mod)return;                       // let copy / paste through
+  const s=S.sel||{r0:0,c0:0,r1:0,c1:0};
+  if(k==="ArrowUp"){e.preventDefault();move(-1,0,e.shiftKey);}
+  else if(k==="ArrowDown"){e.preventDefault();move(1,0,e.shiftKey);}
+  else if(k==="ArrowLeft"){e.preventDefault();move(0,-1,e.shiftKey);}
+  else if(k==="ArrowRight"){e.preventDefault();move(0,1,e.shiftKey);}
+  else if(k==="Tab"){
+    let r=s.r1,c=s.c1+(e.shiftKey?-1:1);
+    if(c>=nC()){c=0;r++;}if(c<0){c=nC()-1;r--;}
+    if(r>nR()-1||r<-1)return;          // at the edge: let focus leave the grid
+    e.preventDefault();setSel(r,c,r,c,true);
+  }
+  else if(k==="Enter"||k==="F2"){e.preventDefault();if(!S.sel)setSel(0,0,0,0);startEdit(S.sel.r1,S.sel.c1);}
+  else if(k==="Delete"||k==="Backspace"){e.preventDefault();clearSel();}
+  else if(k.length===1&&!e.altKey){e.preventDefault();if(!S.sel)setSel(0,0,0,0);startEdit(S.sel.r1,S.sel.c1,k);}
+});
+
+/* editing */
+function startEdit(r,c,init){
+  if(S.edit)endEdit(true);
+  const el=cellEl(r,c);if(!el)return;
+  const cur=r<0?S.headers[c]:(S.rows[r].rec[c]||"");
+  const inp=document.createElement("input");
+  inp.type="text";inp.className="ce";inp.spellcheck=false;inp.value=init!==undefined?init:cur;
+  el.textContent="";el.appendChild(inp);el.classList.add("editing");
+  S.edit={r,c,inp,cur,el};
+  inp.focus();
+  if(init===undefined)inp.select();else inp.setSelectionRange(inp.value.length,inp.value.length);
+  inp.addEventListener("keydown",ev=>{
+    ev.stopPropagation();
+    if(!S.edit)return;
+    const {r,c}=S.edit;
+    if(ev.key==="Enter"){ev.preventDefault();endEdit(true);const nr=r+(ev.shiftKey?-1:1);setSel(nr,c,nr,c,true);gw().focus({preventScroll:true});}
+    else if(ev.key==="Tab"){ev.preventDefault();endEdit(true);const nc=c+(ev.shiftKey?-1:1);setSel(r,nc,r,nc,true);gw().focus({preventScroll:true});}
+    else if(ev.key==="Escape"){ev.preventDefault();endEdit(false);gw().focus({preventScroll:true});}
+  });
+  inp.addEventListener("blur",()=>{if(S.edit&&S.edit.inp===inp)endEdit(true);});
+  inp.addEventListener("paste",ev=>{
+    const tx=(ev.clipboardData||window.clipboardData).getData("text/plain");
+    if(/[\t\n]/.test(tx.replace(/\n$/,""))){
+      ev.preventDefault();const {r,c}=S.edit;endEdit(false);
+      setSel(r,c,r,c);gw().focus({preventScroll:true});gridPaste(tx);
+    }
+  });
+  paintSel(false);
+}
+function endEdit(commit){
+  const e=S.edit;if(!e)return;
+  S.edit=null;
+  const v=e.inp.value.trim();
+  e.el.classList.remove("editing");
+  if(commit&&v!==String(e.cur)) gridSetValue(e.r,e.c,v);
+  else e.el.textContent=e.cur;
+}
+function gridSetValue(r,c,v){
+  pushUndo();
+  if(r<0){
+    S.headers[c]=v||("Column "+(c+1));
+    S.tabs.forEach(t=>autoMap(t,true));
+  }else S.rows[r].rec[c]=v;
+  const el=cellEl(r,c);
+  if(el){el.textContent=r<0?S.headers[c]:v;if(r<0)el.title=S.headers[c]+" — double-click to rename";}
+  refresh({grid:"chips"});
+}
+function clearSel(){
+  const n=normSel();if(!n||n.r1<0)return;
+  pushUndo();
+  for(let r=Math.max(0,n.r0);r<=n.r1;r++)for(let c=n.c0;c<=n.c1;c++)S.rows[r].rec[c]="";
+  refresh();
+}
+
+/* clipboard */
+function tsvQuote(v){v=String(v??"");return /[\t\n"]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function toTSV(){
+  if(!S.headers.length)return "";
+  return [S.headers].concat(S.rows.map(r=>r.rec)).map(row=>row.map(tsvQuote).join("\t")).join("\n");
+}
+function selTSV(){
+  const n=normSel();if(!n)return "";
+  const lines=[];
+  for(let r=n.r0;r<=n.r1;r++){
+    const row=[];
+    for(let c=n.c0;c<=n.c1;c++)row.push(tsvQuote(r<0?S.headers[c]:(S.rows[r].rec[c]||"")));
+    lines.push(row.join("\t"));
+  }
+  return lines.join("\n");
+}
+const gridFocused=()=>document.activeElement===gw();
+document.addEventListener("copy",e=>{
+  if(!gridFocused()||!S.sel||!S.headers.length)return;
+  e.preventDefault();e.clipboardData.setData("text/plain",selTSV());
+});
+document.addEventListener("paste",e=>{
+  if(!gridFocused())return;
+  e.preventDefault();
+  gridPaste((e.clipboardData||window.clipboardData).getData("text/plain")||"");
+});
+/* A paste starts at the selected cell and fills right and down, growing the sheet.
+   An empty sheet, a click on a header cell, or Select-all replaces the whole sheet
+   and treats the first pasted row as headers. */
+function gridPaste(text){
+  const block=parseTSV(text);
+  if(!block.length)return;
+  const replace=!S.headers.length||(S.sel&&S.sel.r0<0&&S.sel.r1<0)||isAllSel();
+  if(replace){
+    const p=gridToSheet(block.filter(r=>r.some(v=>String(v).trim()!=="")));
+    if(!p)return;
+    const fb=loadParsed(p);refresh();
+    msg("parseMsg",routeSummary(p.records.length,fb),"ok");
+    return;
+  }
+  const n=normSel()||{r0:0,c0:0,r1:0,c1:0};
+  const h=block.length,w=Math.max(...block.map(r=>r.length));
+  const r0=Math.max(0,n.r0),c0=n.c0;
+  pushUndo();
+  if(h===1&&w===1&&(n.r1>n.r0||n.c1>n.c0)){                       // one value over a range: fill it
+    const v=String(block[0][0]??"").trim();
+    for(let r=r0;r<=n.r1;r++)for(let c=n.c0;c<=n.c1;c++)S.rows[r].rec[c]=v;
+    msg("parseMsg","Filled "+((n.r1-r0+1)*(n.c1-n.c0+1))+" cells.","ok");
+  }else{
+    while(S.headers.length<c0+w){S.headers.push("Column "+(S.headers.length+1));S.rows.forEach(r=>r.rec.push(""));}
+    while(S.rows.length<r0+h)S.rows.push(mkRow(new Array(S.headers.length).fill("")));
+    block.forEach((row,i)=>{for(let j=0;j<w;j++)S.rows[r0+i].rec[c0+j]=String(row[j]??"").trim();});
+    S.sel={r0,c0,r1:r0+h-1,c1:c0+w-1};
+    msg("parseMsg","Pasted "+h+" × "+w+" cells at row "+(r0+1)+", column "+(c0+1)+".","ok");
+  }
+  refresh();
+}
+
+/* row and column tools */
+function selRows(){const n=normSel();if(!n)return[];const o=[];for(let r=Math.max(0,n.r0);r<=n.r1;r++)o.push(r);return o;}
+function needSheet(){if(S.headers.length)return true;msg("parseMsg","Paste or open a sheet first.","bad");return false;}
+function addRow(){
+  if(!needSheet())return;
+  pushUndo();
+  const n=normSel(),at=n&&n.r1>=0?n.r1+1:S.rows.length;
+  S.rows.splice(at,0,mkRow(new Array(nC()).fill("")));
+  S.sel={r0:at,c0:0,r1:at,c1:0};refresh();
+}
+function dupRows(){
+  const rs=selRows();if(!rs.length){msg("parseMsg","Select a row first — click its number.","bad");return;}
+  pushUndo();
+  const last=rs[rs.length-1];
+  const cp=rs.map(i=>{const o=S.rows[i];return {id:S.nextId++,rec:o.rec.slice(),use:o.use,copies:o.copies,tpl:o.tpl,tab:o.tab,matched:o.matched};});
+  S.rows.splice(last+1,0,...cp);
+  S.sel={r0:last+1,c0:0,r1:last+cp.length,c1:nC()-1};refresh();
+}
+function delRows(){
+  const rs=selRows();if(!rs.length){msg("parseMsg","Select a row first — click its number.","bad");return;}
+  pushUndo();
+  const set=new Set(rs);
+  S.rows=S.rows.filter((_,i)=>!set.has(i));S.sel=null;refresh();
+}
+function addCol(){
+  if(!needSheet())return;
+  pushUndo();
+  S.headers.push("Column "+(nC()+1));S.rows.forEach(r=>r.rec.push(""));
+  S.sel={r0:-1,c0:nC()-1,r1:-1,c1:nC()-1};
+  refresh();startEdit(-1,nC()-1);
+}
+function copyAll(){
+  const t=toTSV();if(!t){msg("parseMsg","Nothing to copy yet.","bad");return;}
+  const ok=()=>msg("parseMsg","Copied "+S.rows.length+" rows — paste straight into Excel.","ok");
+  const fb=()=>{const ta=$("paste");ta.value=t;ta.select();try{document.execCommand("copy");ok();}catch(e){msg("parseMsg","Copy was blocked — open Raw text below and copy it from there.","bad");}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+}
+
+/* =============================================================
+   REFRESH — the one place that brings every view back in line
+   o.grid  "full" (default) | "chips" | "none"
+   o.stage "full" (default) | "patch"
+   ============================================================= */
+function refresh(o){
+  o=o||{};
+  routeAll();
+  if(o.grid==="chips")gridChips();else if(o.grid!=="none")gridRender();
+  mirror();paintTabs();paintMap();paintRows();
+  if(o.stage==="patch")patchStage();else render();
+  undoBtns();save();
+}
+function mirror(){const ta=$("paste");if(document.activeElement!==ta)ta.value=toTSV();}
 
 /* =============================================================
    PANEL PAINTING
@@ -672,40 +1242,41 @@ function render(){
 function paintTabs(){
   $("tabs").innerHTML=S.tabs.map((t,i)=>
     '<button class="tab'+(i===S.active?" on":"")+'" data-i="'+i+'">'+esc(t.tpl.name)
-    +'<span class="c">'+(t.records.length||0)+'</span></button>').join("")
+    +'<span class="c">'+t.rows.length+'</span></button>').join("")
     +'<button class="add" id="tabAdd" title="Add a label type">+</button>';
-  $("tabs").querySelectorAll(".tab").forEach(b=>b.onclick=()=>{S.active=+b.dataset.i;paintAll();});
+  $("tabs").querySelectorAll(".tab").forEach(b=>b.onclick=()=>{S.active=+b.dataset.i;paintAll();save();});
   $("tabAdd").onclick=addType;
 }
 function paintMap(){
   const tab=T(),t=$("mapTable");
   $("mapType").textContent=tab.tpl.name;
   const fields=tplFields(tab.tpl);
-  if(!tab.headers.length){t.innerHTML='<tr><td class="k">No data read yet</td></tr>';$("mapState").textContent="—";return;}
+  if(!S.headers.length){t.innerHTML='<tr><td class="k">No data read yet</td></tr>';$("mapState").textContent="—";return;}
   const opts=i=>'<option value="-1"'+(i<0?" selected":"")+'>— none —</option>'+
-    tab.headers.map((h,j)=>'<option value="'+j+'"'+(i===j?" selected":"")+'>'+esc(h||"Column "+(j+1))+'</option>').join("");
+    S.headers.map((h,j)=>'<option value="'+j+'"'+(i===j?" selected":"")+'>'+esc(h||"Column "+(j+1))+'</option>').join("");
   t.innerHTML=fields.map(f=>{
     const i=tab.map[f.k]??-1;
     return '<tr class="'+(f.k==="model"&&i<0?"miss":"")+'"><td class="k">'+esc(f.n)+'</td><td><select data-f="'+f.k+'">'+opts(i)+'</select></td></tr>';
   }).join("");
   t.querySelectorAll("select").forEach(s=>s.onchange=()=>{
-    tab.map[s.dataset.f]=parseInt(s.value,10);buildRows(tab);paintRows();render();paintMap();
+    tab.map[s.dataset.f]=parseInt(s.value,10);paintRows();render();paintMap();save();
   });
   $("mapState").textContent=fields.filter(f=>(tab.map[f.k]??-1)>=0).length+"/"+fields.length+" matched";
 }
 function paintRows(){
   const tab=T(),t=$("rowsTable"),q=$("filter").value.trim().toLowerCase();
-  $("nRows").textContent=tab.records.length?tab.records.length+" rows here":"no rows";
-  if(!tab.rows.length){t.innerHTML='<tr><th>Rows land here once data is read</th></tr>';$("nSel").textContent="none selected";return;}
-  const vis=tab.rows.filter(r=>!q||r.model.toLowerCase().includes(q));
+  $("nRows").textContent=S.rows.length?S.rows.length+(S.rows.length===1?" row":" rows"):"no rows";
+  if(!tab.rows.length){t.innerHTML='<tr><th>No rows on this type</th></tr>';$("nSel").textContent="none selected";return;}
+  const vis=tab.rows.filter(r=>!q||modelOf(tab,r).toLowerCase().includes(q));
   t.innerHTML='<tr><th style="width:24px"></th><th>Model</th><th style="width:56px">Copies</th></tr>'
-    +vis.map(r=>'<tr><td><input type="checkbox" data-i="'+r.i+'"'+(r.use?" checked":"")+'></td>'
-      +'<td>'+esc(r.model)+'</td><td><input type="number" min="1" max="500" data-c="'+r.i+'" value="'+(r.copies||"")+'" placeholder="—"></td></tr>').join("");
+    +vis.map(r=>'<tr><td><input type="checkbox" data-i="'+r.id+'"'+(r.use?" checked":"")+'></td>'
+      +'<td>'+esc(modelOf(tab,r))+'</td><td><input type="number" min="1" max="500" data-c="'+r.id+'" value="'+(r.copies||"")+'" placeholder="—"></td></tr>').join("");
   t.querySelectorAll("input[type=checkbox]").forEach(cb=>cb.onchange=()=>{
-    tab.rows[+cb.dataset.i].use=cb.checked;$("nSel").textContent=tab.rows.filter(r=>r.use).length+" selected";render();paintTabs();
+    S.idx.get(+cb.dataset.i).use=cb.checked;
+    $("nSel").textContent=tab.rows.filter(r=>r.use).length+" selected";render();save();
   });
   t.querySelectorAll("input[type=number]").forEach(nb=>nb.oninput=()=>{
-    const v=parseInt(nb.value,10);tab.rows[+nb.dataset.c].copies=isNaN(v)||v<1?null:v;render();
+    const v=parseInt(nb.value,10);S.idx.get(+nb.dataset.c).copies=isNaN(v)||v<1?null:v;render();save();
   });
   $("nSel").textContent=tab.rows.filter(r=>r.use).length+" selected";
 }
@@ -724,24 +1295,44 @@ function msg(el,text,kind){$(el).innerHTML=text?'<div class="tape '+(kind||"")+'
 
 $("refBox").innerHTML=
  '<b>Blocks</b><br>head · heading{text} · table{cells,w,kh,vh} · pair{k,f,kw,w,vh} · kvlist{items,kw} · row{lw,rw,left[],right[]} · group{blocks[]} · mark · foot · gap{h}<br><br>'
-+'<b>Label</b><br>titleSize / secSize · padX / padY = inner margins in px at 4 in · headH = height of the title and logo band · flow: "spread" shares leftover space evenly, "top" places blocks by their own mt and pins the footer down<br><br>'+'<b>Spacing</b><br>mt on any block = gap above it, in px at 4 in<br><br>'+'<b>Sizes</b><br>w = share of label width (0-1) · kh / vh = key and value row heights in px at 4 in · group keeps a heading tight to its table · titleSize / secSize set the big type<br><br>'
++'<b>Label</b><br>titleSize / secSize · padX / padY = inner margins in px at 4 in · headH = height of the title and logo band · flow: "spread" shares leftover space evenly, "top" places blocks by their own mt and pins the footer down<br><br>'
++'<b>Spacing</b><br>mt on any block = gap above it, in px at 4 in<br><br>'
++'<b>Sizes</b><br>w = share of label width (0-1) · kh / vh = key and value row heights in px at 4 in · group keeps a heading tight to its table<br><br>'
 +'<b>Cells</b><br>k = printed label · f = field key · w = column weight · fallback = second field to try · suffix / prefix · strip = drop a trailing string<br><br>'
 +'<b>Field keys</b><br>'+Object.keys(LIB).join(" · ");
 
 /* =============================================================
    DATA ACTIONS
    ============================================================= */
-function readText(text){
-  const r=routeAndLoad(text);
-  if(!r.ok){msg("parseMsg",r.msg,"bad");return;}
-  const empty=S.tabs.findIndex(t=>t.records.length);
-  if(!T().records.length&&empty>=0) S.active=empty;
-  paintAll();
-  msg("parseMsg",r.msg,"ok");
+function loadParsed(p){
+  pushUndo();
+  const fb=T().tpl.name;
+  S.headers=p.headers.slice();
+  S.rows=p.records.map(rec=>mkRow(rec));
+  S.tabs.forEach(t=>autoMap(t,false));
+  S.sel=null;
+  routeAll();
+  if(!T().rows.length){const k=S.tabs.findIndex(t=>t.rows.length);if(k>=0)S.active=k;}
+  return fb;
 }
-$("btnParse").onclick=()=>readText($("paste").value);
-$("btnDemo").onclick=()=>{$("paste").value=DEMO;readText(DEMO);
-  msg("parseMsg","Demo rows loaded and split across both types. These are sample values only — paste your own sheet for anything you print.","bad");};
+function routeSummary(n,fb){
+  const parts=S.tabs.filter(t=>t.rows.length).map(t=>t.rows.length+" → "+t.tpl.name);
+  let s=n+" rows read. "+(parts.join(" · ")||"none matched");
+  if(typeCol()<0) s+=". No Label Type column found, so everything went to "+fb+".";
+  else{const un=S.rows.filter(r=>!r.matched).length;if(un)s+=". "+un+" row(s) had an unrecognised type and went to "+fb+".";}
+  return s;
+}
+function readRaw(text){
+  const p=parseSheet(text);
+  if(!p){msg("parseMsg","Nothing to read — paste the cells including the header row.","bad");return;}
+  const fb=loadParsed(p);refresh();
+  msg("parseMsg",routeSummary(p.records.length,fb),"ok");
+}
+$("btnParse").onclick=()=>readRaw($("paste").value);
+$("btnDemo").onclick=()=>{
+  readRaw(DEMO);
+  msg("parseMsg","Demo rows loaded and split across both types. These are sample values only — paste your own sheet for anything you print.","bad");
+};
 $("btnFile").onclick=()=>$("file").click();
 $("file").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
@@ -750,12 +1341,11 @@ $("file").onchange=e=>{
     loadSheetJS().then(X=>{
       const fr=new FileReader();
       fr.onload=()=>{const wb=X.read(new Uint8Array(fr.result),{type:"array"});
-        const txt=X.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]],{FS:"\t"});
-        $("paste").value=txt;readText(txt);};
+        readRaw(X.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]],{FS:"\t"}));};
       fr.readAsArrayBuffer(f);
-    }).catch(()=>msg("parseMsg","The .xlsx reader could not load. Save as CSV, or copy the cells and paste them above.","bad"));
+    }).catch(()=>msg("parseMsg","The .xlsx reader could not load. Save as CSV, or copy the cells and paste them into the grid.","bad"));
   }else{
-    const fr=new FileReader();fr.onload=()=>{$("paste").value=fr.result;readText(fr.result);};fr.readAsText(f);
+    const fr=new FileReader();fr.onload=()=>readRaw(fr.result);fr.readAsText(f);
   }
   e.target.value="";
 };
@@ -771,12 +1361,17 @@ function loadSheetJS(){
   return sheetP;
 }
 $("btnClear").onclick=()=>{
-  S.tabs.forEach(t=>{t.headers=[];t.records=[];t.rows=[];t.map={};});
-  $("paste").value="";msg("parseMsg","");paintAll();
+  if(!S.rows.length&&!S.headers.length)return;
+  pushUndo();S.headers=[];S.rows=[];S.sel=null;
+  msg("parseMsg","Sheet cleared — Undo brings it back.","ok");
+  refresh();
 };
-$("btnAll").onclick=()=>{T().rows.forEach(r=>r.use=true);paintRows();render();};
-$("btnNone").onclick=()=>{T().rows.forEach(r=>r.use=false);paintRows();render();};
+$("btnAll").onclick=()=>{T().rows.forEach(r=>r.use=true);paintRows();render();save();};
+$("btnNone").onclick=()=>{T().rows.forEach(r=>r.use=false);paintRows();render();save();};
 $("filter").oninput=paintRows;
+$("btnUndo").onclick=undo;$("btnRedo").onclick=redo;
+$("btnAddRow").onclick=addRow;$("btnDupRow").onclick=dupRows;$("btnDelRow").onclick=delRows;
+$("btnAddCol").onclick=addCol;$("btnCopyAll").onclick=copyAll;
 
 /* =============================================================
    TYPE / LAYOUT ACTIONS
@@ -786,7 +1381,8 @@ $("filter").oninput=paintRows;
   tpl.name=$("tName").value.trim()||"Untitled";
   tpl.match=$("tMatch").value.split(",").map(s=>s.trim()).filter(Boolean);
   tpl.title=$("tTitle").value;
-  $("tplName").textContent=tpl.name;paintTabs();render();save();
+  $("tplName").textContent=tpl.name;
+  refresh({grid:"chips"});
 });
 $("tBoxed").onchange=()=>{T().tpl.boxed=$("tBoxed").value==="1";render();save();};
 $("btnApply").onclick=()=>{
@@ -797,8 +1393,8 @@ $("btnApply").onclick=()=>{
     T().tpl.blocks=d.blocks;
     ["titleSize","secSize","padX","padY","headH"].forEach(k=>{if(d[k])T().tpl[k]=+d[k];});
     if(d.flow)T().tpl.flow=d.flow;
-    if(T().headers.length){autoMap(T());buildRows(T());}
-    paintMap();paintRows();render();save();
+    autoMap(T(),true);
+    refresh({grid:"none"});
     msg("jsonMsg","Layout applied.","ok");
   }catch(err){msg("jsonMsg","That JSON will not parse: "+err.message,"bad");}
 };
@@ -806,17 +1402,17 @@ $("btnRevert").onclick=paintTpl;
 function addType(){
   const base=clone(T().tpl);
   base.id="type"+Date.now();base.name=base.name+" copy";base.match=[];
-  const tab=newTab(base);
-  tab.headers=T().headers.slice();
-  if(tab.headers.length){autoMap(tab);buildRows(tab);}
-  S.tabs.push(tab);S.active=S.tabs.length-1;paintAll();save();
+  const tab=newTab(base);autoMap(tab,false);
+  S.tabs.push(tab);S.active=S.tabs.length-1;
+  routeAll();gridChips();paintAll();save();
   document.querySelectorAll(".grp")[4].open=true;
 }
 $("btnDup").onclick=addType;
 $("btnDel").onclick=()=>{
   if(S.tabs.length<2){alert("Keep at least one label type.");return;}
-  if(!confirm('Delete "'+T().tpl.name+'"? Its rows are dropped too.'))return;
-  S.tabs.splice(S.active,1);S.active=Math.max(0,S.active-1);paintAll();save();
+  if(!confirm('Delete the "'+T().tpl.name+'" type? Its rows stay in the sheet and move to another tab.'))return;
+  S.tabs.splice(S.active,1);S.active=Math.max(0,S.active-1);
+  routeAll();gridChips();paintAll();save();
 };
 $("btnExport").onclick=()=>{
   const blob=new Blob([JSON.stringify({v:1,types:S.tabs.map(t=>t.tpl)},null,2)],{type:"application/json"});
@@ -832,7 +1428,9 @@ $("impFile").onchange=e=>{
       const d=JSON.parse(fr.result);
       const list=Array.isArray(d)?d:d.types;
       if(!Array.isArray(list)||!list.length) throw new Error("no types in that file");
-      S.tabs=list.map(newTab);S.active=0;paintAll();save();
+      S.tabs=list.map(newTab);S.active=0;
+      S.tabs.forEach(t=>autoMap(t,false));
+      routeAll();gridChips();paintAll();save();
       msg("jsonMsg",list.length+" type(s) imported.","ok");
     }catch(err){msg("jsonMsg","Could not import: "+err.message,"bad");}
   };
@@ -853,7 +1451,7 @@ $("btnArtDefault").onclick=()=>{S.art.logo=DEFAULT_LOGO;S.art.etl=DEFAULT_ETL;re
 $("btnArtNone").onclick=()=>{S.art.logo="";S.art.etl="";render();save();};
 ["logow","markw"].forEach(id=>$(id).oninput=()=>{$(id+"Val").textContent=$(id).value;applySize();save();});
 ["serPat","serStart","serPad","copies","foot","vcol","cw","ch"].forEach(id=>$(id).oninput=()=>{render();save();});
-["serFromCol","serOnLabel","editable","size","scope"].forEach(id=>$(id).onchange=()=>{
+["serFromCol","serShare","serOnLabel","editable","size","scope"].forEach(id=>$(id).onchange=()=>{
   if(id==="size")$("customSize").style.display=$("size").value==="custom"?"flex":"none";
   render();save();
 });
@@ -866,7 +1464,8 @@ $("btnFit").onclick=()=>{
   $("zoom").value=Math.round(z*100/5)*5;$("zoom").oninput();
 };
 $("btnPrint").onclick=()=>{
-  if(!document.querySelector(".lbl")){alert("Nothing to print — read some data and tick a few rows first.");return;}
+  if(!document.querySelector(".lbl")){alert("Nothing to print — paste some data and tick a few rows first.");return;}
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
   const [w,h]=sizeInches();
   let st=$("pageStyle");
   if(!st){st=document.createElement("style");st.id="pageStyle";document.head.appendChild(st);}
@@ -874,39 +1473,76 @@ $("btnPrint").onclick=()=>{
   window.print();
 };
 
-/* optional persistence: the artifact runtime provides window.storage.
-   Running the file from disk keeps everything in memory — use
-   Export types for anything you want to keep. */
-const KEY="nameplate-labels-v2";
-async function save(){
-  try{
-    if(!window.storage)return;
-    await window.storage.set(KEY,JSON.stringify({
-      types:S.tabs.map(t=>t.tpl),art:S.art,
-      s:{serPat:$("serPat").value,serPad:$("serPad").value,foot:$("foot").value,vcol:$("vcol").value,
-         size:$("size").value,page:$("page").value,cw:$("cw").value,ch:$("ch").value,
-         logow:$("logow").value,markw:$("markw").value}
-    }),false);
-  }catch(e){}
+/* ---- resizable side panel ---- */
+function setPanelW(w){
+  w=Math.max(300,Math.min(900,Math.min(window.innerWidth-360,w)));
+  S.panelw=w;document.documentElement.style.setProperty("--panelw",w+"px");
 }
-async function restore(){
+(function(){
+  const sp=$("splitter");let drag=false;
+  sp.addEventListener("mousedown",e=>{drag=true;document.body.classList.add("resizing");e.preventDefault();});
+  document.addEventListener("mousemove",e=>{if(drag)setPanelW(e.clientX);});
+  document.addEventListener("mouseup",()=>{if(drag){drag=false;document.body.classList.remove("resizing");save();}});
+  sp.addEventListener("dblclick",()=>{setPanelW(352);save();});
+})();
+
+/* =============================================================
+   AUTOSAVE — localStorage, this browser only
+   ============================================================= */
+const KEY="icc-nameplate-v3";
+const VAL_IDS=["serPat","serStart","serPad","copies","foot","vcol","size","page","cw","ch","logow","markw","scope"];
+const CHK_IDS=["serFromCol","serShare","serOnLabel","editable"];
+let saveT=null;
+function save(){clearTimeout(saveT);saveT=setTimeout(doSave,300);}
+function doSave(){
   try{
-    if(!window.storage)return;
-    const r=await window.storage.get(KEY,false);
-    if(!r||!r.value)return;
-    const d=JSON.parse(r.value);
-    if(Array.isArray(d.types)&&d.types.length){S.tabs=d.types.map(newTab);S.active=0;}
-    if(d.art)S.art=Object.assign(S.art,d.art);
-    if(d.s)Object.keys(d.s).forEach(k=>{if($(k)&&d.s[k]!=null)$(k).value=d.s[k];});
-  }catch(e){}
+    const art={logo:S.art.logo===DEFAULT_LOGO?"@default":S.art.logo,etl:S.art.etl===DEFAULT_ETL?"@default":S.art.etl};
+    const s={};VAL_IDS.forEach(i=>s[i]=$(i).value);CHK_IDS.forEach(i=>s[i]=$(i).checked);
+    localStorage.setItem(KEY,JSON.stringify({
+      v:3,h:S.headers,r:S.rows.map(r=>({i:r.id,c:r.rec,u:r.use,n:r.copies,t:r.tpl})),nx:S.nextId,
+      types:S.tabs.map(t=>t.tpl),maps:S.tabs.map(t=>t.map),active:S.active,art,s,pw:S.panelw
+    }));
+    $("saveState").textContent="Autosaved "+new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  }catch(e){$("saveState").textContent="Autosave unavailable";}
 }
-(async function init(){
+function loadSaved(){
+  let d=null;
+  try{d=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){}
+  if(!d||d.v!==3||!Array.isArray(d.types)||!d.types.length)return false;
+  S.tabs=d.types.map(newTab);
+  S.tabs.forEach((t,i)=>{if(d.maps&&d.maps[i])t.map=d.maps[i];});
+  S.active=Math.min(d.active||0,S.tabs.length-1);
+  S.headers=Array.isArray(d.h)?d.h:[];
+  S.rows=(d.r||[]).map(x=>({id:x.i,rec:x.c,use:x.u!==false,copies:x.n||null,tpl:x.t||"",tab:0,matched:true}));
+  S.nextId=Math.max(d.nx||1,...S.rows.map(r=>r.id+1),1);
+  if(d.art){
+    S.art.logo=d.art.logo==="@default"?DEFAULT_LOGO:(d.art.logo??DEFAULT_LOGO);
+    S.art.etl=d.art.etl==="@default"?DEFAULT_ETL:(d.art.etl??DEFAULT_ETL);
+  }
+  if(d.s){
+    VAL_IDS.forEach(i=>{if(d.s[i]!=null&&$(i))$(i).value=d.s[i];});
+    CHK_IDS.forEach(i=>{if(d.s[i]!=null&&$(i))$(i).checked=!!d.s[i];});
+  }
+  if(d.pw)S.panelw=d.pw;
+  return true;
+}
+$("btnWipe").onclick=()=>{
+  if(!confirm("Clear everything this tool has saved in this browser — the sheet, custom label types, artwork and settings — and start fresh?"))return;
+  clearTimeout(saveT);
+  try{localStorage.removeItem(KEY);}catch(e){}
+  location.reload();
+};
+
+(function init(){
   resetTabs();
-  await restore();
+  const had=loadSaved();
+  if(!had) S.tabs.forEach(t=>autoMap(t,false));
   document.body.dataset.page=$("page").value;
   $("customSize").style.display=$("size").value==="custom"?"flex":"none";
   $("logowVal").textContent=$("logow").value;$("markwVal").textContent=$("markw").value;
-  paintAll();
+  setPanelW(S.panelw);
+  routeAll();gridRender();paintAll();mirror();undoBtns();setNote("");
+  $("saveState").textContent=had?"Restored from this browser":"Autosave on";
 })();
 </script>
 </body>
